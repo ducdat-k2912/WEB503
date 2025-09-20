@@ -19,6 +19,18 @@ app.get("/api/posts/sum", (req, res) => {
   res.send(`Tổng của ${a} và ${b} là: ${sum}`);
 });
 
+app.get("/api/users", (req, res) => {
+  res.send("Danh sách User");
+});
+
+app.get("/api/products", (req, res) => {
+  res.send("Danh sách Product");
+});
+
+app.get("/api/posts", (req, res) => {
+  res.send("Danh sách Post");
+});
+
 app.listen(PORT, () => {
   console.log(`Server chạy tại http://localhost:${PORT}`);
 });
