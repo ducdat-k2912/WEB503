@@ -2,17 +2,52 @@ import { Router } from "express";
 
 const postsRouter = Router();
 
+let posts = [
+    { id: 1, title: "Bài viết 1", content: "Nội dung bài viết 1" },
+    { id: 2, title: "Bài viết 2", content: "Nội dung bài viết 2" },
+];
+
+
+//GET /api/posts - Lấy danh sách
 postsRouter.get("/",(req,res)=>{
-    res.send("Posts");
+    res.json(posts);
 });
 
-postsRouter.get("/detail/:id",(req, res)=>{
-    res.send("Post detail có id là:" + req.params?.id)
+//GET /api/posts/:id - Lấy chi tiết
+postsRouter.get("/:id",(req, res)=>{
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if(!post) return res.status(404).json({error: "Post not found"}); 
+    res.json(post);
 });
 
-postsRouter.get("/detail",(req, res)=>{
-    console.log(req.query?.name);
-    res.send(req.query?.name)
+//POST /api/posts - Thêm bài viết
+postsRouter.post("/",(req, res)=>{
+    //body: Title
+    const {title, content} = req.body;
+    const newPost = {id: posts.length ? posts[posts.length - 1].id + 1 : 1, title, content}; //ID tự động tăng
+    posts.push(newPost);
+    res.status(201).json(newPost)
+});
+
+//PUT /api/posts/:id - Cập nhật bài viết
+postsRouter.put("/:id",(req, res)=>{
+    const post = posts.find((p) => p.id === parseInt(req.params.id));
+    if(!post) return res.status(404).json({error: "Post not found"}); 
+
+    const {title, content} = req.body;
+    post.title = title || post.title;
+    post.content = content || post.content;
+
+    res.json(post);
+});
+
+//DELETE /api/posts/:id - Xoá bài viết
+postsRouter.delete("/:id",(req, res)=>{
+    const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
+    if(index === -1) return res.status(404).json({error: "Post not found"});
+
+    posts.splice(index, 1);
+    res.json({success: true});
 });
 
 export default postsRouter;
