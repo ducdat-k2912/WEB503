@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { getPosts } from "../controllers/post";
+
 const postsRouter = Router();
 
 let posts = [
@@ -9,9 +11,7 @@ let posts = [
 
 
 //GET /api/posts - Lấy danh sách
-postsRouter.get("/",(req,res)=>{
-    res.json(posts);
-});
+postsRouter.get("/",getPosts);
 
 //GET /api/posts/:id - Lấy chi tiết
 postsRouter.get("/:id",(req, res)=>{
@@ -37,6 +37,10 @@ postsRouter.put("/:id",(req, res)=>{
     const {title, content} = req.body;
     post.title = title || post.title;
     post.content = content || post.content;
+
+
+    console.log("Update", post);
+    
 
     res.json(post);
 });
