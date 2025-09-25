@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getPosts } from "../controllers/post";
+import { addPosts, deletePosts, getPosts, getPostsByID, updatePosts } from "../controllers/post";
 
 const postsRouter = Router();
 
@@ -14,44 +14,15 @@ let posts = [
 postsRouter.get("/",getPosts);
 
 //GET /api/posts/:id - Lấy chi tiết
-postsRouter.get("/:id",(req, res)=>{
-    const post = posts.find((p) => p.id === parseInt(req.params.id));
-    if(!post) return res.status(404).json({error: "Post not found"}); 
-    res.json(post);
-});
+postsRouter.get("/:id",getPostsByID);
 
 //POST /api/posts - Thêm bài viết
-postsRouter.post("/",(req, res)=>{
-    //body: Title
-    const {title, content} = req.body;
-    const newPost = {id: posts.length ? posts[posts.length - 1].id + 1 : 1, title, content}; //ID tự động tăng
-    posts.push(newPost);
-    res.status(201).json(newPost)
-});
+postsRouter.post("/",addPosts);
 
 //PUT /api/posts/:id - Cập nhật bài viết
-postsRouter.put("/:id",(req, res)=>{
-    const post = posts.find((p) => p.id === parseInt(req.params.id));
-    if(!post) return res.status(404).json({error: "Post not found"}); 
-
-    const {title, content} = req.body;
-    post.title = title || post.title;
-    post.content = content || post.content;
-
-
-    console.log("Update", post);
-    
-
-    res.json(post);
-});
+postsRouter.put("/:id",updatePosts);
 
 //DELETE /api/posts/:id - Xoá bài viết
-postsRouter.delete("/:id",(req, res)=>{
-    const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
-    if(index === -1) return res.status(404).json({error: "Post not found"});
-
-    posts.splice(index, 1);
-    res.json({success: true});
-});
+postsRouter.delete("/:id",deletePosts);
 
 export default postsRouter;
