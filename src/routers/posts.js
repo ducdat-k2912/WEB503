@@ -13,7 +13,7 @@ let posts = [
 //GET /api/posts - Lấy danh sách
 postsRouter.get("/",getPosts);
 
-// GET /api/posts/search?q=keyword - Tìm kiếm bài viết
+// GET /api/posts/search?search=keyword - Tìm kiếm bài viết
 postsRouter.get("/search",searchPosts);
 
 //GET /api/posts/:id - Lấy chi tiết
