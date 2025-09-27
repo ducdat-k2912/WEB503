@@ -1,12 +1,13 @@
 import express from "express";
 import router from "./routers";
 import morgan from "morgan";
+import postsRouter from "./routers/posts.js";
 
 
 const app = express();
 
 //Dùng morgan để log ở chế độ 'dev'
-app.use(morgan("DEV"));
+app.use(morgan("dev"));
 
 //Middle ware tích hợp để parse JSON: req.body
 app.use(express.json());

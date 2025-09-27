@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { addPosts, deletePosts, getPosts, getPostsByID, updatePosts } from "../controllers/post";
+import { addPosts, deletePosts, getPosts, getPostsByID, updatePosts, searchPosts } from "../controllers/post";
 
 const postsRouter = Router();
 
@@ -12,6 +12,9 @@ let posts = [
 
 //GET /api/posts - Lấy danh sách
 postsRouter.get("/",getPosts);
+
+// GET /api/posts/search?q=keyword - Tìm kiếm bài viết
+postsRouter.get("/search",searchPosts);
 
 //GET /api/posts/:id - Lấy chi tiết
 postsRouter.get("/:id",getPostsByID);

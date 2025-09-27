@@ -42,8 +42,30 @@ export function updatePosts(req, res) {
 export function deletePosts(req, res) {
     const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
     if (index === -1) {
-        return res.json("Lối 404")
+        return res.json("Lỗi 404")
     }
     posts.splice(index, 1);
     res.json({succes: true});
+}       
+// Tìm kiếm posts
+export function searchPosts(req, res) {
+  try {
+    // Không có bài nào
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ message: "Không có bài viết nào" });
+    }
+    const { search } = req.query;
+    // Không có tham số search => trả về toàn bộ
+    if (!search) {
+      return res.json(posts);
+    }
+    // Lọc theo title, không phân biệt hoa/thường
+    const keyword = search.toLowerCase();
+    const results = posts.filter((p) =>
+      p.title.toLowerCase().includes(keyword)
+    );
+    return res.json(results);
+  } catch (error) {
+    return res.status(500).json({ message: "Lỗi server", error: error.message });
+  }
 }
