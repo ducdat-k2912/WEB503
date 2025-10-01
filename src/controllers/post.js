@@ -1,3 +1,5 @@
+import Post from "../models/post";
+
 let posts = [
     { id: 1, title: "Bài viết 1", content: "Nội dung bài viết 1" },
     { id: 2, title: "Bài viết 2", content: "Nội dung bài viết 2" },
@@ -5,67 +7,80 @@ let posts = [
 ];
 
 //Lấy danh sách
-export function getPosts(req, res) {
-    res.json(posts)
+export async function getPosts(req, res) {
+  //Post.find()
+  try {
+    const post = await Post.find();
+    return res.json(post);
+  } catch (error) {
+    return res.json({message: error.message});
+  }
 }
 //Lấy chi tiết
-export function getPostsByID(req, res) {
-    const post = posts.find((p) => p.id === parseInt(req.params.id));
-    if (!post) {
-        return res.json("Lỗi 404")
+export async function getPostsByID(req, res) {
+    try {
+      const { id } = req.params;
+      const post = await Post.findById(id);
+      if(!post) {
+        return res.status(404).json({message: "Không tìm thấy bài viết"})
+      }
+      return res.json(post);
+    } catch (error) {
+      return res.status(400).json({message: error.message})
     }
-    res.json(post)
 }
 //Thêm bài viết
-export function addPosts(req, res) {
-    const {title, content} = req.body;
-    const newPost = {id: posts.length ? posts[posts.length - 1].id + 1 : 1, title, content}; //ID tự động tăng
-    posts.push(newPost);
+export async function addPosts(req, res) {
+  try {
+    //Model.create(data) : data = rq.body, Model = Post
+    const newPost = await Post.create(req.body);
     res.status(201).json(newPost)
+  } catch (error) {
+    return res.status (400).json({message: error.message})    
+  }
 }
 //Cập nhật bài viết
-export function updatePosts(req, res) {
-    const post = posts.find((p) => p.id === parseInt(req.params.id));
-    if(!post) {
-        return res.json("Lỗi 404")
-    } 
-
-    const {title, content} = req.body;
-    post.title = title || post.title;
-    post.content = content || post.content;
-
-    console.log("Update", post);
-
-    res.json(post);
+export async function updatePosts(req, res) {
+    try {
+      const { id } = req.params;
+      const { title, content } = req.body;
+      const post = await Post.findByIdAndUpdate(id,{ title, content },{ new: true });
+      if(!post) return res.status(404).json("Lỗi 404 - Không tìm thấy bài viết");
+      res.json(post);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json("Lỗi server");
+    }
 }
 //Xoá bài viết
-export function deletePosts(req, res) {
-    const index = posts.findIndex((p) => p.id === parseInt(req.params.id));
-    if (index === -1) {
-        return res.json("Lỗi 404")
+export async function deletePosts(req, res) {
+    try {
+      const { id } = req.params;
+      const deletePosts = await Post.findByIdAndDelete(id);
+      if(!deletePosts) {
+        return res.status(404).json({message: "Không tìm thấy bài viết"})
+      }
+      res.json({success: true});
+    } catch (error) {
+      console.error("Delete error:", error);
+      res.status(500).json({message: "Lỗi server"});
     }
-    posts.splice(index, 1);
-    res.json({succes: true});
 }       
 // Tìm kiếm posts
-export function searchPosts(req, res) {
+export async function searchPosts(req, res) {
   try {
-    // Không có bài nào
-    if (!posts || posts.length === 0) {
-      return res.status(404).json({ message: "Không có bài viết nào" });
+    const keyword = req.query.keyword;
+    if (!keyword) {
+      return res.json("Vui lòng nhập từ khoá tìm kiếm");
     }
-    const { search } = req.query;
-    // Không có tham số search => trả về toàn bộ
-    if (!search) {
-      return res.json(posts);
-    }
-    // Lọc theo title, không phân biệt hoa/thường
-    const keyword = search.toLowerCase();
-    const results = posts.filter((p) =>
-      p.title.toLowerCase().includes(keyword)
-    );
-    return res.json(results);
+    const posts = await Post.find({
+      $or: [
+        { title: new RegExp(keyword, "i") },
+        { content: new RegExp(keyword, "i") }
+      ]
+    });
+    res.json(posts);
   } catch (error) {
-    return res.status(500).json({ message: "Lỗi server", error: error.message });
+    res.status(500).json({ message: "Lỗi server" });
   }
 }

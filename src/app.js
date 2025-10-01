@@ -2,6 +2,7 @@ import express from "express";
 import router from "./routers";
 import morgan from "morgan";
 import postsRouter from "./routers/posts.js";
+import mongoose from "mongoose";
 
 
 const app = express();
@@ -11,6 +12,11 @@ app.use(morgan("dev"));
 
 //Middle ware tích hợp để parse JSON: req.body
 app.use(express.json());
+
+mongoose
+  .connect("mongodb://localhost:27017/web503_nodejs")
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("Could not connect to MongoDB:", err));
 
 //Localhost:3000
 app.get("/",(req, res)=>{
