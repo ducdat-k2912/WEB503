@@ -32,7 +32,6 @@ export async function getPostsByID(req, res) {
 //Thêm bài viết
 export async function addPosts(req, res) {
   try {
-    //Model.create(data) : data = rq.body, Model = Post
     const newPost = await Post.create(req.body);
     res.status(201).json(newPost)
   } catch (error) {

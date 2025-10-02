@@ -1,8 +1,7 @@
 import express from "express";
-import router from "./routers";
 import morgan from "morgan";
-import postsRouter from "./routers/posts.js";
 import mongoose from "mongoose";
+import router from "./routers/index.js";
 
 
 const app = express();
